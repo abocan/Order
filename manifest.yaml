@@ -1,0 +1,42 @@
+# $(appName)/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderdemo
+  labels:
+    app: orderdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orderdemo
+  template:
+    metadata:
+      labels:
+        app: orderdemo
+    spec:
+      containers:
+        - name: orderdemo
+          image: akshelmtest.azurecr.io/$(Build.Repository.Name):$(Build.BuildId)
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: orderdemo
+  labels:
+    app: orderdemo
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: orderdemo
